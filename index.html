@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>START</title>
+<style>
+  /* ===== RESET & BASE ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #fff;
+    color: #2D3436;
+    line-height: 1.5;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+
+  /* ===== APP CONTAINER ===== */
+  #app {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ===== SCREENS ===== */
+  .screen {
+    display: none;
+    animation: fadeIn 0.25s ease-out;
+  }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ===== TYPOGRAPHY ===== */
+  .step-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #00B894;
+    margin-bottom: 0.75rem;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+    color: #2D3436;
+  }
+
+  .subtitle {
+    font-size: 0.9375rem;
+    color: #636E72;
+    margin-bottom: 1.75rem;
+    line-height: 1.5;
+  }
+
+  .guidance {
+    font-size: 0.875rem;
+    color: #636E72;
+    background: #F7F7F5;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+  }
+
+  .guidance strong { color: #2D3436; }
+
+  .examples {
+    font-size: 0.8125rem;
+    color: #636E72;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+  .examples span { display: block; }
+  .examples .arrow { color: #00B894; }
+
+  /* ===== ORIGINAL TASK DISPLAY ===== */
+  .original-task {
+    font-size: 0.875rem;
+    color: #B2BEC3;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #F0F0F0;
+  }
+  .original-task strong { color: #636E72; }
+
+  /* ===== TINY ACTION DISPLAY (timer screen) ===== */
+  .tiny-action-display {
+    text-align: center;
+    padding: 0.5rem 0 1.5rem;
+  }
+  .tiny-action-display .label {
+    font-size: 0.75rem;
+    color: #B2BEC3;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.5rem;
+  }
+  .tiny-action-display .action {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2D3436;
+    line-height: 1.3;
+  }
+
+  /* ===== INPUTS ===== */
+  .input-group { margin-bottom: 1.5rem; }
+
+  textarea {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.125rem;
+    font-family: inherit;
+    border: 2px solid #E0E0E0;
+    border-radius: 10px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.15s;
+    background: #fff;
+    color: #2D3436;
+    line-height: 1.4;
+  }
+  textarea:focus { border-color: #00B894; }
+  textarea::placeholder { color: #B2BEC3; }
+
+  /* ===== BUTTONS ===== */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    font-family: inherit;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:active { transform: scale(0.98); }
+
+  .btn-primary {
+    background: #00B894;
+    color: #fff;
+  }
+  .btn-primary:hover { background: #00A383; }
+  .btn-primary:focus-visible { outline: 3px solid #00B894; outline-offset: 2px; }
+
+  .btn-secondary {
+    background: #F7F7F5;
+    color: #2D3436;
+  }
+  .btn-secondary:hover { background: #EDEDEB; }
+  .btn-secondary:focus-visible { outline: 3px solid #B2BEC3; outline-offset: 2px; }
+
+  .btn-danger {
+    background: transparent;
+    color: #B2BEC3;
+    font-size: 0.875rem;
+    font-weight: 400;
+    padding: 0.75rem;
+  }
+  .btn-danger:hover { color: #E17055; }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  /* ===== TIMER DISPLAY ===== */
+  .timer-display {
+    text-align: center;
+    padding: 2rem 0;
+  }
+  .timer-countdown {
+    font-size: 4rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #00B894;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.02em;
+  }
+  .timer-countdown.running { color: #2D3436; }
+  .timer-countdown.warning { color: #E17055; }
+
+  .timer-label {
+    font-size: 0.8125rem;
+    color: #B2BEC3;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .timer-status {
+    font-size: 0.875rem;
+    color: #636E72;
+    margin-top: 0.5rem;
+  }
+
+  /* ===== COMPLETION SCREEN ===== */
+  .completion-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  .completion-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    color: #2D3436;
+  }
+  .completion-sub {
+    font-size: 0.9375rem;
+    color: #636E72;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .done-message {
+    text-align: center;
+    padding: 2rem 0;
+  }
+  .done-message .check {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  .done-message h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .done-message p {
+    color: #636E72;
+    margin-bottom: 2rem;
+  }
+
+  /* ===== FOOTER ===== */
+  .footer-note {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #DFE6E9;
+    margin-top: 2rem;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 400px) {
+    body { padding: 1rem; }
+    h1 { font-size: 1.5rem; }
+    .timer-countdown { font-size: 3rem; }
+    textarea { font-size: 1rem; padding: 0.875rem; }
+  }
+
+  @media (min-height: 700px) {
+    .screen { padding-top: 10vh; }
+  }
+
+  @media (min-height: 800px) {
+    .screen { padding-top: 15vh; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===== SCREEN 1: ONE THING ===== -->
+  <div id="screen-1" class="screen">
+    <div class="step-label">Step 1</div>
+    <h1>What's the ONE thing you're having trouble starting?</h1>
+    <p class="subtitle">One thing. Not a list. The one that feels hardest to begin.</p>
+
+    <div class="input-group">
+      <textarea id="input-1" rows="2" placeholder="e.g. Write the quarterly report" maxlength="500"></textarea>
+    </div>
+
+    <button id="btn-1" class="btn btn-primary" disabled>MAKE IT SMALLER →</button>
+  </div>
+
+  <!-- ===== SCREEN 2: TINY START ===== -->
+  <div id="screen-2" class="screen">
+    <div class="step-label">Step 2</div>
+    <h1>What's the smallest physical action you could do right now?</h1>
+
+    <div class="original-task" id="original-task"></div>
+
+    <div class="guidance"><strong>Make it almost too easy.</strong> The first step should take less than 2 minutes. If it feels too big, make it smaller.</div>
+
+    <div class="examples">
+      <span>Write report <span class="arrow">→</span> Open the document</span>
+      <span>Clean kitchen <span class="arrow">→</span> Put one dish in the sink</span>
+      <span>Exercise <span class="arrow">→</span> Put on your shoes</span>
+    </div>
+
+    <div class="input-group">
+      <textarea id="input-2" rows="2" placeholder="e.g. Open the document and write the title" maxlength="500"></textarea>
+    </div>
+
+    <button id="btn-2" class="btn btn-primary" disabled>I CAN DO THAT →</button>
+  </div>
+
+  <!-- ===== SCREEN 3: START (TIMER) ===== -->
+  <div id="screen-3" class="screen">
+    <div class="step-label">Step 3</div>
+
+    <div class="tiny-action-display" id="tiny-action-display">
+      <div class="label">Your tiny action</div>
+      <div class="action" id="tiny-action-text"></div>
+    </div>
+
+    <!-- Pre-timer state -->
+    <div id="pre-timer">
+      <div class="timer-display">
+        <div class="timer-countdown">5:00</div>
+        <div class="timer-label">5 minutes</div>
+      </div>
+      <button id="btn-start-timer" class="btn btn-primary">START 5 MINUTES</button>
+    </div>
+
+    <!-- During timer -->
+    <div id="during-timer" style="display:none;">
+      <div class="timer-display">
+        <div class="timer-countdown running" id="timer-display">5:00</div>
+        <div class="timer-status">Do your tiny action until the timer ends</div>
+      </div>
+      <button id="btn-stop-timer" class="btn btn-danger">STOP</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 4: COMPLETION ===== -->
+  <div id="screen-4" class="screen">
+    <div class="completion-icon">✓</div>
+    <div class="completion-title" id="completion-title">You did five minutes.</div>
+    <div class="completion-sub" id="completion-sub">What do you want to do now?</div>
+
+    <div class="btn-group">
+      <button id="btn-completion-primary" class="btn btn-primary">KEEP GOING — 5 MORE MIN</button>
+      <button id="btn-completion-done" class="btn btn-secondary">I'M DONE</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 4b: DONE ===== -->
+  <div id="screen-done" class="screen">
+    <div class="done-message">
+      <div class="check">✓</div>
+      <h2>That's enough. You started.</h2>
+      <p>One thing, made tiny, started. That's the whole process.</p>
+      <button id="btn-start-again" class="btn btn-primary">START SOMETHING ELSE</button>
+    </div>
+  </div>
+
+  <div class="footer-note">START — a tool for beginning things</div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ===== STATE =====
+  const state = {
+    currentScreen: 1,
+    oneThing: '',
+    tinyAction: '',
+    endTime: null,
+    timerInterval: null,
+    isRunning: false,
+    completedNaturally: false,
+    sessionCount: 0
+  };
+
+  const FIVE_MIN = 300000; // 5 minutes in milliseconds
+
+  // ===== DOM REFS =====
+  const screens = {
+    1: document.getElementById('screen-1'),
+    2: document.getElementById('screen-2'),
+    3: document.getElementById('screen-3'),
+    4: document.getElementById('screen-4'),
+    done: document.getElementById('screen-done')
+  };
+
+  const input1 = document.getElementById('input-1');
+  const input2 = document.getElementById('input-2');
+  const btn1 = document.getElementById('btn-1');
+  const btn2 = document.getElementById('btn-2');
+  const btnStartTimer = document.getElementById('btn-start-timer');
+  const btnStopTimer = document.getElementById('btn-stop-timer');
+  const btnCompletionPrimary = document.getElementById('btn-completion-primary');
+  const btnCompletionDone = document.getElementById('btn-completion-done');
+  const btnStartAgain = document.getElementById('btn-start-again');
+  const originalTask = document.getElementById('original-task');
+  const tinyActionText = document.getElementById('tiny-action-text');
+  const timerDisplay = document.getElementById('timer-display');
+  const preTimer = document.getElementById('pre-timer');
+  const duringTimer = document.getElementById('during-timer');
+  const completionTitle = document.getElementById('completion-title');
+
+  // ===== SCREEN MANAGEMENT =====
+  function showScreen(num) {
+    Object.keys(screens).forEach(key => {
+      screens[key].classList.remove('active');
+    });
+    if (num === 'done') {
+      screens.done.classList.add('active');
+    } else {
+      screens[num].classList.add('active');
+    }
+    state.currentScreen = num;
+    if (num === 1) input1.focus();
+    if (num === 2) input2.focus();
+  }
+
+  // ===== INPUT VALIDATION =====
+  input1.addEventListener('input', function() {
+    btn1.disabled = this.value.trim().length === 0;
+  });
+
+  input2.addEventListener('input', function() {
+    btn2.disabled = this.value.trim().length === 0;
+  });
+
+  input1.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey && !btn1.disabled) {
+      e.preventDefault();
+      goToScreen2();
+    }
+  });
+
+  input2.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey && !btn2.disabled) {
+      e.preventDefault();
+      goToScreen3();
+    }
+  });
+
+  // ===== SCREEN 1 → 2 =====
+  function goToScreen2() {
+    state.oneThing = input1.value.trim();
+    originalTask.innerHTML = '<strong>Your task:</strong> ' + escapeHtml(state.oneThing);
+    showScreen(2);
+    setTimeout(() => input2.focus(), 300);
+  }
+
+  btn1.addEventListener('click', goToScreen2);
+
+  // ===== SCREEN 2 → 3 =====
+  function goToScreen3() {
+    state.tinyAction = input2.value.trim();
+    tinyActionText.textContent = state.tinyAction;
+    resetTimer();
+    showScreen(3);
+  }
+
+  btn2.addEventListener('click', goToScreen3);
+
+  // ===== TIMER =====
+  function resetTimer() {
+    stopTimer();
+    state.endTime = null;
+    state.isRunning = false;
+    state.completedNaturally = false;
+    timerDisplay.textContent = '5:00';
+    timerDisplay.classList.remove('warning', 'running');
+    preTimer.style.display = 'block';
+    duringTimer.style.display = 'none';
+  }
+
+  function getRemainingMs() {
+    if (!state.endTime) return FIVE_MIN;
+    return Math.max(0, state.endTime - Date.now());
+  }
+
+  function updateTimerDisplay() {
+    const remaining = getRemainingMs();
+    const totalSec = Math.ceil(remaining / 1000);
+    const mins = Math.floor(totalSec / 60);
+    const secs = totalSec % 60;
+    timerDisplay.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+
+    if (state.isRunning) {
+      if (remaining <= 30000) {
+        timerDisplay.classList.add('warning');
+      } else {
+        timerDisplay.classList.remove('warning');
+      }
+    }
+  }
+
+  function startTimer() {
+    if (state.isRunning) return;
+    state.isRunning = true;
+    state.completedNaturally = false;
+    state.endTime = Date.now() + FIVE_MIN;
+    state.sessionCount++;
+    preTimer.style.display = 'none';
+    duringTimer.style.display = 'block';
+    timerDisplay.classList.add('running');
+    timerDisplay.classList.remove('warning');
+
+    state.timerInterval = setInterval(function() {
+      const remaining = getRemainingMs();
+
+      if (remaining <= 0) {
+        stopTimer();
+        state.completedNaturally = true;
+        timerComplete();
+        return;
+      }
+
+      updateTimerDisplay();
+    }, 200); // Check every 200ms for responsiveness
+  }
+
+  function stopTimer() {
+    state.isRunning = false;
+    if (state.timerInterval) {
+      clearInterval(state.timerInterval);
+      state.timerInterval = null;
+    }
+    timerDisplay.classList.remove('running');
+  }
+
+  function timerComplete() {
+    timerDisplay.textContent = '0:00';
+    duringTimer.style.display = 'none';
+    preTimer.style.display = 'none';
+
+    // Set completion screen text based on how the session ended
+    if (state.completedNaturally) {
+      completionTitle.textContent = 'You did five minutes.';
+      btnCompletionPrimary.textContent = 'KEEP GOING — 5 MORE MIN';
+    } else {
+      completionTitle.textContent = "You started. That's enough if you want it to be.";
+      btnCompletionPrimary.textContent = 'TRY ANOTHER 5 MIN';
+    }
+
+    showScreen(4);
+  }
+
+  btnStartTimer.addEventListener('click', startTimer);
+
+  btnStopTimer.addEventListener('click', function() {
+    stopTimer();
+    state.completedNaturally = false;
+    timerComplete();
+  });
+
+  // ===== SCREEN 4: COMPLETION =====
+  btnCompletionPrimary.addEventListener('click', function() {
+    resetTimer();
+    showScreen(3);
+    // Auto-start the next timer
+    startTimer();
+  });
+
+  btnCompletionDone.addEventListener('click', function() {
+    showScreen('done');
+  });
+
+  // ===== SCREEN DONE: START AGAIN =====
+  btnStartAgain.addEventListener('click', function() {
+    state.oneThing = '';
+    state.tinyAction = '';
+    input1.value = '';
+    input2.value = '';
+    btn1.disabled = true;
+    btn2.disabled = true;
+    resetTimer();
+    showScreen(1);
+  });
+
+  // ===== UTILITY =====
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  // ===== KEYBOARD =====
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      if (state.currentScreen === 2) {
+        showScreen(1);
+        input1.value = state.oneThing;
+        btn1.disabled = state.oneThing.length === 0;
+      }
+      if (state.currentScreen === 3 && !state.isRunning) {
+        showScreen(2);
+        input2.value = state.tinyAction;
+        btn2.disabled = state.tinyAction.length === 0;
+      }
+    }
+  });
+
+  // ===== INIT =====
+  showScreen(1);
+
+})();
+</script>
+</body>
+</html>
